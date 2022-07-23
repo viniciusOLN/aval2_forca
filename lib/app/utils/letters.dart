@@ -27,7 +27,7 @@ final letters = [
   'M',
 ];
 
-String removeDiacritics(String str) {
+String removeAccent(String str) {
   var withDia =
       'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž';
   var withoutDia =

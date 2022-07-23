@@ -37,8 +37,8 @@ class GameController {
   }
 
   List<Letter> splitWord() {
-    List<String> listWord =
-        removeDiacritics(currentWord).toUpperCase().split('');
+    List<String> listWord = removeAccent(currentWord).toUpperCase().split('');
+
     return List.generate(
       listWord.length,
       (index) => Letter(
@@ -67,8 +67,8 @@ class GameController {
   }
 
   bool checkLetter(String currentLetter) {
-    selectedLetters.add(currentLetter);
     bool result = false;
+    selectedLetters.add(currentLetter);
 
     List.generate(lettersOfTheWord.length, (index) {
       if (lettersOfTheWord[index].letter == currentLetter) {
@@ -80,6 +80,7 @@ class GameController {
     return result;
   }
 
+  //se a tentativa for errada, ele adiciona um na quantidade de tentativas feitas
   bool verifyCurrentAttempt(bool result) {
     if (!result) {
       currentAttempt++;
