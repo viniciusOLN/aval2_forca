@@ -1,7 +1,6 @@
 import 'package:aval2_forca/app/controllers/game_controller.dart';
 import 'package:aval2_forca/app/utils/letters.dart';
 import 'package:flutter/material.dart';
-
 import '../../models/letter.dart';
 
 class HomePage extends StatefulWidget {
@@ -15,7 +14,7 @@ class _HomePageState extends State<HomePage> {
   GameController controller = GameController();
   @override
   Widget build(BuildContext context) {
-    List<Letter> a = controller.lettersOfTheWord;
+    List<Letter> lettersWord = controller.lettersOfTheWord;
 
     return Scaffold(
       appBar: AppBar(
@@ -25,16 +24,14 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-          Text('escolhendo palavra'),
-          Text("Aqui vai a dica"),
+          controller.checkTip() ? Text(controller.currentTip) : const Text(' '),
           Container(
             height: 200,
-            child: Image.asset('images/imagem_base.png'),
+            child: Image.asset('images/image_${controller.currentAttempt}.png'),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children:
-                List.generate(controller.lettersOfTheWord.length, (index) {
+            children: List.generate(lettersWord.length, (index) {
               return Container(
                 margin: const EdgeInsets.all(10),
                 decoration: const BoxDecoration(
@@ -45,8 +42,8 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-                child: a[index].isSelected
-                    ? Text(controller.currentWord[index])
+                child: lettersWord[index].isSelected
+                    ? Text(lettersWord[index].letter)
                     : const Text(' '),
               );
             }),
@@ -62,13 +59,30 @@ class _HomePageState extends State<HomePage> {
                   letters.length,
                   (index) => IconButton(
                     onPressed: () {
+                      setState(() {
+                        controller.changeKeyboardLetter(letters[index]);
+                      });
                       if (controller.verifyLetter(letters[index])) {
                         setState(() {
-                          a;
+                          lettersWord;
+                        });
+                      } else {
+                        setState(() {
+                          controller.currentAttempt;
                         });
                       }
+                      if (controller.verifyGuesses()) {
+                        print("perdeu");
+                      }
                     },
-                    icon: Text(letters[index]),
+                    icon: Text(
+                      controller.gameKeyboard[index].letter,
+                      style: TextStyle(
+                        color: controller.gameKeyboard[index].isSelected
+                            ? Colors.blue
+                            : Colors.red,
+                      ),
+                    ),
                   ),
                 ),
               ),
