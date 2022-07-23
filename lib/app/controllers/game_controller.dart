@@ -62,8 +62,8 @@ class GameController {
       changeKeyboardLetter(currentLetter);
       return false;
     }
-    bool checkedLetter = checkLetter(currentLetter);
-    return verifyCurrentAttempt(checkedLetter);
+
+    return checkLetter(currentLetter);
   }
 
   bool checkLetter(String currentLetter) {
@@ -77,14 +77,10 @@ class GameController {
       }
     });
 
-    return result;
-  }
-
-  //se a tentativa for errada, ele adiciona um na quantidade de tentativas feitas
-  bool verifyCurrentAttempt(bool result) {
     if (!result) {
       currentAttempt++;
     }
+
     return result;
   }
 
