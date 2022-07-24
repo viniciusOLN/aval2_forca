@@ -1,7 +1,11 @@
 import 'package:aval2_forca/app/controllers/game_controller.dart';
+import 'package:aval2_forca/app/screens/homepage/widgets/image.dart';
+import 'package:aval2_forca/app/screens/homepage/widgets/keyboard.dart';
+import 'package:aval2_forca/app/screens/resultpage/resultpage.dart';
 import 'package:aval2_forca/app/utils/letters.dart';
 import 'package:flutter/material.dart';
 import '../../models/letter.dart';
+import 'widgets/current_word.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -12,6 +16,34 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   GameController controller = GameController();
+
+  bool _verifyLetter(String currentLetter) {
+    if (controller.verifyLetter(currentLetter)) {
+      setState(() {
+        controller.lettersOfTheWord;
+      });
+      return true;
+    }
+    setState(() {
+      controller.currentAttempt;
+    });
+    return false;
+  }
+
+  void _redirectResult() {
+    if (controller.verifyGuesses() ||
+        controller.correctLetters == controller.currentWord.length) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) {
+            return ResultPage(controller: controller);
+          },
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Letter> lettersWord = controller.lettersOfTheWord;
@@ -25,68 +57,40 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           controller.checkTip() ? Text(controller.currentTip) : const Text(' '),
-          Container(
-            height: 200,
-            child: Image.asset('images/image_${controller.currentAttempt}.png'),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(lettersWord.length, (index) {
-              return Container(
-                margin: const EdgeInsets.all(10),
-                decoration: const BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: Colors.blue,
-                      width: 3,
-                    ),
-                  ),
-                ),
-                child: lettersWord[index].isSelected
-                    ? Text(lettersWord[index].letter)
-                    : const Text(' '),
+          ImageWidget(url: 'images/image_${controller.currentAttempt}.png'),
+          Word(lettersWord: lettersWord),
+          Keyboard(
+            letters: letters,
+            gameKeyboard: controller.gameKeyboard,
+            onPressed: (index) {
+              String snackbarText = '';
+              setState(() {
+                controller.changeKeyboardLetter(letters[index]);
+              });
+
+              bool checkLetter = _verifyLetter(letters[index]);
+
+              if (checkLetter) {
+                snackbarText = 'Letra correta!';
+              } else {
+                snackbarText = 'Letra errada!';
+              }
+
+              final snackBar = SnackBar(
+                duration: const Duration(milliseconds: 500),
+                content: Text(snackbarText),
               );
-            }),
+
+              if (controller.gameKeyboard[index].showSnackbar) {
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                controller.gameKeyboard[index].showSnackbar = false;
+              }
+
+              _redirectResult();
+            },
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Wrap(
-                alignment: WrapAlignment.center,
-                runSpacing: 10.0,
-                spacing: 10.0,
-                children: List.generate(
-                  letters.length,
-                  (index) => IconButton(
-                    onPressed: () {
-                      setState(() {
-                        controller.changeKeyboardLetter(letters[index]);
-                      });
-                      if (controller.verifyLetter(letters[index])) {
-                        setState(() {
-                          lettersWord;
-                        });
-                      } else {
-                        setState(() {
-                          controller.currentAttempt;
-                        });
-                      }
-                      if (controller.verifyGuesses()) {
-                        print("perdeu");
-                      }
-                    },
-                    icon: Text(
-                      controller.gameKeyboard[index].letter,
-                      style: TextStyle(
-                        color: controller.gameKeyboard[index].isSelected
-                            ? Colors.blue
-                            : Colors.red,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+          const Text(
+            "Vinicius Oliveira do Nascimento, Marcos Vinícius dos Santos Dantas",
           ),
         ],
       ),
