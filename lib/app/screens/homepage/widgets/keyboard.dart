@@ -1,14 +1,14 @@
 import 'package:aval2_forca/app/models/keyboard_letter.dart';
 import 'package:flutter/material.dart';
 
+import '../../../utils/constants.dart';
+
 class Keyboard extends StatelessWidget {
-  List<String> letters;
-  List<LetterKeyboard> gameKeyboard;
+  List<LetterKeyboard> letters;
   Function(int index) onPressed;
   Keyboard({
     Key? key,
     required this.letters,
-    required this.gameKeyboard,
     required this.onPressed,
   }) : super(key: key);
 
@@ -19,16 +19,28 @@ class Keyboard extends StatelessWidget {
       children: [
         Wrap(
           alignment: WrapAlignment.center,
-          runSpacing: 10.0,
-          spacing: 10.0,
+          runAlignment: WrapAlignment.center,
+          runSpacing: 0.0,
+          spacing: 2.0,
           children: List.generate(
             letters.length,
             (index) => IconButton(
+              iconSize: 30,
               onPressed: () => onPressed(index),
-              icon: Text(
-                gameKeyboard[index].letter,
-                style: TextStyle(
-                  color: gameKeyboard[index].color,
+              icon: Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: letters[index].color,
+                  borderRadius: const BorderRadius.all(Radius.circular(2)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(0),
+                  child: Text(
+                    letters[index].letter,
+                    style: TextStyle(
+                      color: kKeyboardColor,
+                    ),
+                  ),
                 ),
               ),
             ),

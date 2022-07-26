@@ -3,6 +3,7 @@ import 'package:aval2_forca/app/models/keyboard_letter.dart';
 import 'package:aval2_forca/app/models/letter.dart';
 import 'package:aval2_forca/app/utils/letters.dart';
 import 'package:flutter/material.dart';
+import '../utils/constants.dart';
 import '../utils/words.dart';
 
 class GameController {
@@ -15,10 +16,9 @@ class GameController {
   List<String> selectedLetters = [];
   int maxGuesses = 6;
   int limitTip = 4;
-  int controlSnackbar = 0;
-  Color colorCorrectAnswer = Colors.yellow;
-  Color colorWrongAnswer = Colors.red;
-  Color colorDefault = Colors.blue;
+  Color colorCorrectAnswer = kColorCorrectAnswer;
+  Color colorWrongAnswer = kColorWrongAnswer;
+  Color colorDefault = kColorDefault;
 
   GameController() {
     randomWord();
@@ -46,57 +46,61 @@ class GameController {
       (index) => LetterKeyboard(
         letters[index],
         index,
-        true,
         colorDefault,
         true,
       ),
     );
   }
 
+  String wordWithoutSpaces() {
+    return currentWord.replaceAll(' ', '');
+  }
+
   List<Letter> splitWord() {
     List<String> listWord = removeAccent(currentWord).toUpperCase().split('');
-
-    return List.generate(
-      listWord.length,
-      (index) => Letter(
+    return List.generate(listWord.length, (index) {
+      if (listWord[index] == ' ') {
+        return Letter(
+          ' ',
+          index,
+          true,
+        );
+      }
+      return Letter(
         listWord[index],
         index,
         false,
-      ),
-    );
-  }
-
-  void changeKeyboardLetter(String currentLetter, {Color color = Colors.red}) {
-    List.generate(gameKeyboard.length, (index) {
-      if (gameKeyboard[index].letter == currentLetter &&
-          gameKeyboard[index].color != colorCorrectAnswer) {
-        gameKeyboard[index].isSelected = false;
-        gameKeyboard[index].color = color;
-      }
+      );
     });
   }
 
-  bool verifyLetter(String currentLetter) {
-    if (selectedLetters.contains(currentLetter)) {
-      changeKeyboardLetter(currentLetter, color: colorWrongAnswer);
-      return false;
+  void changeKeyboardLetter(String currentLetter, {Color color = Colors.red}) {
+    for (var letter in gameKeyboard) {
+      if (letter.letter == currentLetter &&
+          letter.color != colorCorrectAnswer) {
+        letter.color = color;
+      }
     }
+  }
 
-    return checkLetter(currentLetter);
+  bool verifyLetter(String currentLetter) {
+    return selectedLetters.contains(currentLetter)
+        ? false
+        : checkLetter(currentLetter);
   }
 
   bool checkLetter(String currentLetter) {
     bool result = false;
     selectedLetters.add(currentLetter);
 
-    List.generate(lettersOfTheWord.length, (index) {
-      if (lettersOfTheWord[index].letter == currentLetter) {
-        lettersOfTheWord[index].isSelected = true;
+    for (var letter in lettersOfTheWord) {
+      if (letter.letter == currentLetter) {
         changeKeyboardLetter(currentLetter, color: colorCorrectAnswer);
-        correctLetters++;
+        letter.isSelected = true;
         result = true;
+        correctLetters++;
       }
-    });
+    }
 
     if (!result) {
       currentAttempt++;
@@ -104,9 +108,6 @@ class GameController {
 
     return result;
   }
-
-  bool selectedLetter(String currentLetter) =>
-      selectedLetters.contains(currentLetter) ? true : false;
 
   bool verifyGuesses() => (currentAttempt >= maxGuesses) ? true : false;
 

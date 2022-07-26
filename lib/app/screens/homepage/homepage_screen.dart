@@ -5,6 +5,7 @@ import 'package:aval2_forca/app/screens/resultpage/resultpage.dart';
 import 'package:aval2_forca/app/utils/letters.dart';
 import 'package:flutter/material.dart';
 import '../../models/letter.dart';
+import '../../utils/constants.dart';
 import 'widgets/current_word.dart';
 
 class HomePage extends StatefulWidget {
@@ -32,7 +33,7 @@ class _HomePageState extends State<HomePage> {
 
   void _redirectResult() {
     if (controller.verifyGuesses() ||
-        controller.correctLetters == controller.currentWord.length) {
+        controller.correctLetters == controller.wordWithoutSpaces().length) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -56,14 +57,19 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-          controller.checkTip() ? Text(controller.currentTip) : const Text(' '),
+          controller.checkTip()
+              ? Text(
+                  controller.currentTip,
+                  style: kWordStyle,
+                )
+              : const Text(' '),
           ImageWidget(url: 'images/image_${controller.currentAttempt}.png'),
           Word(lettersWord: lettersWord),
           Keyboard(
-            letters: letters,
-            gameKeyboard: controller.gameKeyboard,
+            letters: controller.gameKeyboard,
             onPressed: (index) {
-              String snackbarText = '';
+              String snackbarText = 'Letra errada!';
+
               setState(() {
                 controller.changeKeyboardLetter(letters[index]);
               });
@@ -72,8 +78,6 @@ class _HomePageState extends State<HomePage> {
 
               if (checkLetter) {
                 snackbarText = 'Letra correta!';
-              } else {
-                snackbarText = 'Letra errada!';
               }
 
               final snackBar = SnackBar(
@@ -91,6 +95,7 @@ class _HomePageState extends State<HomePage> {
           ),
           const Text(
             "Vinicius Oliveira do Nascimento, Marcos Vinícius dos Santos Dantas",
+            textAlign: TextAlign.center,
           ),
         ],
       ),
