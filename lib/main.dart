@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
       ),
-      initialRoute: '/home',
+      initialRoute: '/splashscreen',
       routes: Routes.routes,
     );
   }
